@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Play, Pause, Trash2, Clock } from "lucide-react";
+import { Play, Pause, Trash2, Clock, Calendar, BarChart3 } from "lucide-react";
 import { Job } from "@/types/job";
 import { useToast } from "@/hooks/use-toast";
 
@@ -43,6 +43,23 @@ export const JobList = ({ jobs, onExecuteJob, onDeleteJob, onUpdateJob }: JobLis
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const getTimeUntilNext = (nextRun: Date | null | undefined): string => {
+    if (!nextRun) return "Not scheduled";
+    
+    const now = new Date();
+    const diff = nextRun.getTime() - now.getTime();
+    
+    if (diff <= 0) return "Overdue";
+    
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    
+    if (days > 0) return `${days}d ${hours % 24}h`;
+    if (hours > 0) return `${hours}h ${minutes % 60}m`;
+    return `${minutes}m`;
   };
 
   const handleTogglePause = (job: Job) => {
@@ -116,6 +133,21 @@ export const JobList = ({ jobs, onExecuteJob, onDeleteJob, onUpdateJob }: JobLis
                   </div>
                   <p className="ml-6">{getScheduleDescription(job)}</p>
                 </div>
+
+                {job.nextRun && job.status === "active" && (
+                  <div className="text-sm text-gray-600">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Calendar className="h-4 w-4" />
+                      <span className="font-medium">Next run:</span>
+                    </div>
+                    <p className="ml-6">
+                      {job.nextRun.toLocaleString()} 
+                      <span className="text-blue-600 ml-2">
+                        ({getTimeUntilNext(job.nextRun)})
+                      </span>
+                    </p>
+                  </div>
+                )}
                 
                 {job.lastRun && (
                   <div className="text-sm text-gray-600">
@@ -125,12 +157,21 @@ export const JobList = ({ jobs, onExecuteJob, onDeleteJob, onUpdateJob }: JobLis
                     </span>
                   </div>
                 )}
-                
+
                 <div className="text-sm text-gray-600">
-                  <span className="font-medium">Created:</span>
-                  <span className="ml-2">
-                    {new Date(job.createdAt).toLocaleString()}
-                  </span>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <BarChart3 className="h-4 w-4" />
+                      <span className="font-medium">Executions:</span>
+                      <span>{job.executionCount || 0}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Created:</span>
+                      <span className="ml-2">
+                        {new Date(job.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex gap-2 pt-2">

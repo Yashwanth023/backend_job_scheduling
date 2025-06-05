@@ -12,5 +12,7 @@ export interface Job {
   };
   createdAt: Date;
   lastRun: Date | null;
+  nextRun?: Date | null;
   status: "active" | "paused" | "completed";
+  executionCount?: number;
 }
