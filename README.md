@@ -143,4 +143,4 @@ interface JobExecution {
 - **Real Execution**: Jobs actually run automatically, not just simulation
 - **Persistent Scheduling**: Jobs continue running even if page is refreshed
 - **Production Ready**: Can be easily extended to connect to real backend APIs
-- **Scalable Architecture**: Modular design allows easy feature additions
+- **Scalable Architecture**: Modular design allows easy feature additions.
